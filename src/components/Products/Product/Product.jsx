@@ -1,13 +1,40 @@
 import React from "react";
-import { useParams } from "react-router-dom";
 import { useState } from "react";
 import "./Product.css"
+import { useEffect } from "react";
+import axios from "axios";
+
 
 
 const Product = ({data}) => {
-    
     const [count, setcount] = useState(1);
     const [visible, setvisible] = useState(1);
+
+
+   
+useEffect(() => {  
+ axios
+   .patch(`http://localhost:8080/cartItems/${data.id}`, {
+     count: count,
+   })
+   .catch((error) => console.log(error)); 
+}, [count,data.id])
+
+
+      useEffect(() => {
+          axios({
+          url: `http://localhost:8080/cartItems/${data.id}`,
+        })
+          .then((res) => {
+            setcount(res.data.count);
+            if(res.data.count>=1)
+            {
+              setvisible(0);
+            }
+          }).catch((err)=>{console.log("ignore")})
+  },[data.id])
+      
+
  const addcart=()=>{
      fetch("http://localhost:8080/cartItems", {
        method: "POST",
@@ -15,20 +42,19 @@ const Product = ({data}) => {
          "content-type": "application/json",
        },
        body: JSON.stringify({
-         productId: data.id,
+         id: data.id,
          count: count,
        }),
      })
        .then((r) => r.json())
        .then((d) => {
-         setcount(count);
          setvisible(0);
        });
  }
 
  
   const Ondelete = (id) => {
-    fetch(`http://localhost:8080/cartItems/${data.id}`, {
+    fetch(`http://localhost:8080/cartItems/${id}`, {
       method: "DELETE",
     });
     setvisible(1);
@@ -48,7 +74,9 @@ const Product = ({data}) => {
         
         <button
           data-cy="product-increment-cart-item-count-button"
-          onClick={() => setcount(count + 1)}
+          onClick={() => {
+            setcount(count + 1);
+          }}
         >
           +
         </button>
@@ -57,10 +85,11 @@ const Product = ({data}) => {
           data-cy="product-decrement-cart-item-count-button"
           onClick={() => {
             setcount(count - 1);
-            if(count<2)
+            if(count<=1)
             {
               setvisible(1)
               setcount(1);
+              Ondelete(data.id);
             }
           }}
         >
@@ -68,7 +97,7 @@ const Product = ({data}) => {
         </button>
         <button
           data-cy="product-remove-cart-item-button"
-          onClick={Ondelete}
+          onClick={()=>(Ondelete(data.id))}
         >
           remove from cart
         </button>
