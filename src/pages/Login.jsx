@@ -4,8 +4,8 @@ import axios from "axios";
 import { Navigate } from "react-router-dom";
 
 const Login = () => {
- const [email, setEmail] = useState("");
- const [password, setPassword] = useState("");
+ const [email, setEmail] = useState("eve.holt@reqres.in");
+ const [password, setPassword] = useState("cityslicka");
  const [state, dispatch] = useContext(AuthContext);
 
  const handleSubmit = (e) => {
@@ -32,7 +32,7 @@ const Login = () => {
  };
 
  if (state.isAuth) {
-   return <Navigate to="/" />;
+   return <Navigate to="/products" />;
  }
 
   return (

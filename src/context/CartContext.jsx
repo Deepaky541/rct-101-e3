@@ -8,7 +8,8 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
 
 
-const [cartcount, setcartcount] = useState(1)
+const [cartcount, setcartcount] = useState([])
+const [count, setcount] = useState(0)
 
          useEffect(() => {
            axios({
@@ -16,12 +17,13 @@ const [cartcount, setcartcount] = useState(1)
              method: "GET",
            })
              .then((res) => {
-               console.log(res);
               setcartcount(res.data);
+              setcount(res.data.length);
              })
              .catch((err) => {});
          }, []);
-         console.log(cartcount)
+        
+         
 
-  return <CartContext.Provider>{children}</CartContext.Provider>;
+  return <CartContext.Provider value={{count}}>{children}</CartContext.Provider>;
 };
