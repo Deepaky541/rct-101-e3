@@ -8,7 +8,7 @@ import { CartContext } from "../../context/CartContext";
 
 const Navbar = () => {
    const [state,dispatch] = useContext(AuthContext);
-   const {count} = useContext(CartContext);
+   const [count] = useContext(CartContext);
    const navigate=useNavigate();
 
    const handletoggle=()=>{
@@ -29,7 +29,6 @@ const Navbar = () => {
         home
       </Link>
       <Link to="/login">login</Link>
-      <Link to="/products">products</Link>
       <span data-cy="navbar-cart-items-count">cart:{count}</span>
       <button onClick={handletoggle} data-cy="navbar-login-logout-button">
         {state.isAuth ? "logout" : "login"}

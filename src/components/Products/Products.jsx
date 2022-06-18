@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 const Products = () => {
   const [data, setData] = useState([]);
-
+  
      useEffect(() => {
       axios({
         url: `http://localhost:8080/products`,
@@ -14,16 +14,18 @@ const Products = () => {
       })
         .then((res) => {
           setData(res.data);
-          console.log(res.data);
         })
       
     }, []);
   return (
   <div>
    
-      {   data.map((item)=>(<div key={item.id}>
+      {   data.map((item)=>{
+          return(
+          <div key={item.id}>
           <Product  data={item}/>
-          </div>))
+          </div>)
+          })
         }
  </div>)
 

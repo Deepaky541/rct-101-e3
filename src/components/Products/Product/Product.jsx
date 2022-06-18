@@ -3,27 +3,39 @@ import { useState } from "react";
 import "./Product.css"
 import { useEffect } from "react";
 import axios from "axios";
+import { useContext } from "react";
+import { CartContext } from "../../../context/CartContext";
 
 
 
 const Product = ({data}) => {
     const [count, setcount] = useState(1);
     const [visible, setvisible] = useState(1);
+    const [concount,{setconcount}] = useContext(CartContext);
+    const [istrue, setistrue] = useState(0)
+
+    useEffect(() => {
+      axios({
+        url: `http://localhost:8080/cartitems`,
+        method: "GET",
+      }).then((res) => {
+        res.data.map((el)=>{ 
+          if(el.id===data.id)
+          {
+            setistrue(el.id);
+          }
+          return(console.log())
+        })
+       
+        
+      });
+    }, [data.id]);
 
 
-   
-useEffect(() => {  
- axios
-   .patch(`http://localhost:8080/cartItems/${data.id}`, {
-     count: count,
-   })
-   .catch((error) => console.log(error)); 
-}, [count,data.id])
-
-
-      useEffect(() => {
+    useEffect(() => {
+       if(istrue!==0){
           axios({
-          url: `http://localhost:8080/cartItems/${data.id}`,
+          url: `http://localhost:8080/cartItems/${istrue}`,
         })
           .then((res) => {
             setcount(res.data.count);
@@ -32,8 +44,22 @@ useEffect(() => {
               setvisible(0);
             }
           }).catch((err)=>{console.log("ignore")})
-  },[data.id])
-      
+       }
+  },[istrue])
+
+   
+useEffect(() => {  
+  if(istrue!==0){
+ axios
+   .patch(`http://localhost:8080/cartItems/${istrue}`, {
+     count: count,
+   })
+   .catch((error) => console.log("ignore")); 
+  }
+}, [count,istrue])
+
+
+  
 
  const addcart=()=>{
      fetch("http://localhost:8080/cartItems", {
@@ -43,13 +69,15 @@ useEffect(() => {
        },
        body: JSON.stringify({
          id: data.id,
-         count: count,
+         count: 1,
        }),
      })
        .then((r) => r.json())
        .then((d) => {
          setvisible(0);
        });
+       setconcount(concount+1)
+       
  }
 
  
@@ -58,6 +86,7 @@ useEffect(() => {
       method: "DELETE",
     });
     setvisible(1);
+    setconcount(concount-1);
   };
 
  
@@ -82,13 +111,13 @@ useEffect(() => {
         </button>
         <span data-cy="product-count">{count}</span>
         <button
+          
           data-cy="product-decrement-cart-item-count-button"
           onClick={() => {
             setcount(count - 1);
             if(count<=1)
             {
               setvisible(1)
-              setcount(1);
               Ondelete(data.id);
             }
           }}
